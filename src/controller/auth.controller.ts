@@ -22,6 +22,7 @@ interface CreateAccountBody {
   email: string;
   password: string;
 }
+
 export const createAccount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { firstName, lastName, email, password } = req.body as CreateAccountBody;
   if (!firstName || !lastName || !email || !password) {
