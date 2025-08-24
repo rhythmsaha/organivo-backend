@@ -12,11 +12,14 @@ export interface IUser extends Document {
   verified: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  verificationCode?: string;
 
   // Methods
   comparePassword: (enteredPassword: string) => Promise<boolean>;
   signAccessToken: () => string;
   getProfile: () => object;
+  generateVerificationCode: () => Promise<string>;
+  verifyEmail: (code: string) => Promise<boolean>;
 }
 
 const UserSchema = new Schema(
@@ -62,6 +65,10 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    verificationCode: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -86,6 +93,23 @@ const UserSchema = new Schema(
           verified: this.verified,
         };
       },
+
+      generateVerificationCode: async function () {
+        const code = crypto.randomInt(100000, 999999).toString();
+        this.verificationCode = code;
+        await this.save();
+        return code;
+      },
+
+      verifyEmail: async function (code: string) {
+        if (this.verificationCode === code) {
+          this.verified = true;
+          this.verificationCode = undefined;
+          await this.save();
+          return true;
+        }
+        return false;
+      },
     },
   }
 );
@@ -100,3 +124,68 @@ UserSchema.pre<IUser>("save", async function (next) {
 
 const User: Model<IUser> = model<IUser>("User", UserSchema);
 export default User;
+
+export interface ITempEmail extends Document {
+  email: string;
+  verificationCode: string | null;
+  userId: string;
+  verified: boolean;
+
+  verifyEmail: (code: string) => Promise<boolean>;
+  deleteRecord: () => Promise<void>;
+}
+
+const TempEmailSchema = new Schema<ITempEmail>(
+  {
+    userId: {
+      type: String,
+      required: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      validate: [validator.isEmail, "Please provide a valid email address"],
+    },
+
+    verificationCode: {
+      type: String,
+    },
+
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+    methods: {
+      verifyEmail: async function (code: string) {
+        if (this.verificationCode === code) {
+          this.verified = true;
+          this.verificationCode = null;
+          await this.save();
+          return true;
+        }
+
+        return false;
+      },
+
+      deleteRecord: async function () {
+        await this.deleteOne();
+      },
+    },
+  }
+);
+
+TempEmailSchema.pre<ITempEmail>("save", async function (next) {
+  if (!this.isModified("verificationCode")) return next();
+
+  const code = crypto.randomInt(100000, 999999).toString();
+  this.verificationCode = code;
+  await this.save();
+  next();
+});
+
+const TempEmail: Model<ITempEmail> = model<ITempEmail>("TempEmail", TempEmailSchema);
+export { TempEmail };
