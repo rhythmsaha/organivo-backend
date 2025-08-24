@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Model, ObjectId } from "mongoose";
+import { Document, Schema, Model, model } from "mongoose";
 import validator from "validator";
 import crypto from "node:crypto";
 import { HASH_PW_SALT, JWT_EXPIRES_IN, JWT_SECRET } from "../config/env";
@@ -97,3 +97,6 @@ UserSchema.pre<IUser>("save", async function (next) {
   this.hashed_password = crypto.pbkdf2Sync(this.hashed_password, salt!, 1000, 64, "sha512").toString("hex");
   next();
 });
+
+const User: Model<IUser> = model<IUser>("User", UserSchema);
+export default User;
