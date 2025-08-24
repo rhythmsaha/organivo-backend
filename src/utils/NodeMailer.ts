@@ -56,6 +56,35 @@ class NodeMailer {
 
     return info.messageId;
   }
+
+  async sendUpdateEmailCode({ code, name, to }: { to: string; code: string; name: string }) {
+    const templatePath = path.join(__dirname, "../config/emails", "updateEmail.ejs");
+    const htmlContent = await ejs.renderFile(templatePath, { name, code, newEmail: to });
+    const textContent = `
+        Hello ${name},
+
+        You requested to update your account email to ${to}.
+
+        Here's your verification code:
+        ${code}
+
+        Enter this code in Organivo to confirm your new email address.
+
+        If you didn't request this change, you can safely ignore this message and your email will remain unchanged.
+
+        — The Organivo Team
+        `;
+
+    const info = await this.transporter.sendMail({
+      from: '"Organivo" <organivo@rhythmsaha.dev>',
+      to,
+      subject: "Your Email Verification Code",
+      text: textContent,
+      html: htmlContent,
+    });
+
+    return info.messageId;
+  }
 }
 
 export default NodeMailer;

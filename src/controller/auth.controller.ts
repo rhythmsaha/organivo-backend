@@ -46,7 +46,7 @@ export const createAccount = asyncHandler(async (req: Request, res: Response, ne
     throw new Error("User creation failed");
   }
 
-  // const messageId = await sendVerificationCode(newUser);
+  sendVerificationCode(newUser);
 
   res.status(201).json({
     success: true,
@@ -80,7 +80,7 @@ export const resendVerificationMail = asyncHandler(async (req: Request, res: Res
     await user.save();
   }
 
-  await mailer.sendVerificationEmail({
+  mailer.sendVerificationEmail({
     code: user.verificationCode,
     name: `${user.firstName} ${user.lastName}`,
     to: user.email,
@@ -293,6 +293,11 @@ export const updateEmail = asyncHandler(async (req: Request, res: Response, next
   }
 
   // send code in email
+  mailer.sendUpdateEmailCode({
+    code: saveEmail.verificationCode!,
+    name: `${user.firstName} ${user.lastName}`,
+    to: email,
+  });
 
   res.status(201).json({
     success: true,
@@ -322,6 +327,11 @@ export const resendVerificationCode = asyncHandler(async (req: Request, res: Res
   const code = tempEmail.verificationCode;
 
   // send email
+  mailer.sendUpdateEmailCode({
+    code: code!,
+    name: `${userName?.firstName} ${userName?.lastName}`,
+    to: tempEmail.email,
+  });
 
   res.status(200).json({
     success: true,
