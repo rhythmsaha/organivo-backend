@@ -1,8 +1,10 @@
 import { PORT } from "./config/env";
 import { app } from "./app";
+import connectDB from "./config/connectDB";
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
+  connectDB();
 });
 
 // Handle unhandled promise rejections
