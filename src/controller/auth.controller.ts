@@ -1,19 +1,20 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import User, { IUser, TempEmail } from "../models/User.model";
 import { default as validator } from "validator";
 import { mailer } from "../utils/NodeMailer";
 import ErrorHandler from "../utils/AppError";
+import crypto from "crypto";
 
 const sendVerificationCode = async (user: IUser) => {
   const code = await user.generateVerificationCode();
-  // const messageId = await mailer.sendVerificationEmail({
-  //   code,
-  //   name: `${user.firstName} ${user.lastName}`,
-  //   to: user.email,
-  // });
+  const messageId = await mailer.sendVerificationEmail({
+    code,
+    name: `${user.firstName} ${user.lastName}`,
+    to: user.email,
+  });
 
-  // return messageId;
+  return messageId;
 };
 
 interface CreateAccountBody {
@@ -100,11 +101,11 @@ export const resendVerificationMail = asyncHandler(async (req: Request, res: Res
     await user.save();
   }
 
-  // mailer.sendVerificationEmail({
-  //   code: user.verificationCode,
-  //   name: `${user.firstName} ${user.lastName}`,
-  //   to: user.email,
-  // });
+  mailer.sendVerificationEmail({
+    code: user.verificationCode,
+    name: `${user.firstName} ${user.lastName}`,
+    to: user.email,
+  });
 
   res.status(200).json({
     success: true,
@@ -317,8 +318,13 @@ export const updateEmail = asyncHandler(async (req: Request, res: Response, next
     throw new ErrorHandler("Invalid email", 400);
   }
 
+  if (email === user.email) {
+    throw new ErrorHandler("New email must be different from the current email", 400);
+  }
+
   const tempEmail = new TempEmail({
     email: email,
+    verificationCode: crypto.randomInt(100000, 999999).toString(),
     userId: user._id,
   });
 
@@ -415,5 +421,8 @@ export const verifyNewEmail = asyncHandler(async (req: Request, res: Response, n
   res.status(200).json({
     success: true,
     message: "Email verified successfully",
+    data: {
+      email: user.email,
+    },
   });
 });

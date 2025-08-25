@@ -120,12 +120,6 @@ UserSchema.pre<IUser>("save", async function (next) {
   next();
 });
 
-// UserSchema.methods.comparePassword = async function (enteredPassword: string) {
-//   const hashed = crypto.pbkdf2Sync(enteredPassword, HASH_PW_SALT, 1000, 64, "sha512").toString("hex");
-//   console.log(this.hashed_password);
-//   return this.hashed_password === hashed;
-// };
-
 const User: Model<IUser> = model<IUser>("User", UserSchema);
 export default User;
 
@@ -182,14 +176,14 @@ const TempEmailSchema = new Schema<ITempEmail>(
   }
 );
 
-TempEmailSchema.pre<ITempEmail>("save", async function (next) {
-  if (!this.isModified("verificationCode")) return next();
+// TempEmailSchema.pre<ITempEmail>("save", async function (next) {
+//   if (!this.isModified("verificationCode")) return next();
 
-  const code = crypto.randomInt(100000, 999999).toString();
-  this.verificationCode = code;
-  await this.save();
-  next();
-});
+//   const code = crypto.randomInt(100000, 999999).toString();
+//   this.verificationCode = code;
+
+//   next();
+// });
 
 const TempEmail: Model<ITempEmail> = model<ITempEmail>("TempEmail", TempEmailSchema);
 export { TempEmail };
