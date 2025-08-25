@@ -58,7 +58,6 @@ const UserSchema = new Schema(
       type: String,
       required: [true, "Please provide a password"],
       minlength: [8, "Password must be at least 8 characters long"],
-      select: false,
     },
 
     verified: {
@@ -73,7 +72,7 @@ const UserSchema = new Schema(
   {
     timestamps: true,
     methods: {
-      comparePassword: async function (enteredPassword: string) {
+      comparePassword: function (enteredPassword: string) {
         const hashed = crypto.pbkdf2Sync(enteredPassword, HASH_PW_SALT, 1000, 64, "sha512").toString("hex");
         return this.hashed_password === hashed;
       },
@@ -116,11 +115,16 @@ const UserSchema = new Schema(
 
 UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("hashed_password")) return next();
-
   const salt = HASH_PW_SALT;
   this.hashed_password = crypto.pbkdf2Sync(this.hashed_password, salt!, 1000, 64, "sha512").toString("hex");
   next();
 });
+
+// UserSchema.methods.comparePassword = async function (enteredPassword: string) {
+//   const hashed = crypto.pbkdf2Sync(enteredPassword, HASH_PW_SALT, 1000, 64, "sha512").toString("hex");
+//   console.log(this.hashed_password);
+//   return this.hashed_password === hashed;
+// };
 
 const User: Model<IUser> = model<IUser>("User", UserSchema);
 export default User;

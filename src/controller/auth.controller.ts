@@ -7,13 +7,13 @@ import ErrorHandler from "../utils/AppError";
 
 const sendVerificationCode = async (user: IUser) => {
   const code = await user.generateVerificationCode();
-  const messageId = await mailer.sendVerificationEmail({
-    code,
-    name: `${user.firstName} ${user.lastName}`,
-    to: user.email,
-  });
+  // const messageId = await mailer.sendVerificationEmail({
+  //   code,
+  //   name: `${user.firstName} ${user.lastName}`,
+  //   to: user.email,
+  // });
 
-  return messageId;
+  // return messageId;
 };
 
 interface CreateAccountBody {
@@ -34,6 +34,25 @@ export const createAccount = asyncHandler(async (req: Request, res: Response, ne
   }
 
   // Create user logic here
+
+  const user = await User.findOne({ email });
+
+  if (user) {
+    if (!user.verified) {
+      sendVerificationCode(user);
+      res.status(201).json({
+        success: true,
+        message: "Verification code sent",
+        data: {
+          email: user.email,
+          id: user._id,
+        },
+      });
+      return;
+    }
+
+    throw new ErrorHandler("User already exists", 400);
+  }
 
   const newUser = await User.create({
     firstName,
@@ -81,11 +100,11 @@ export const resendVerificationMail = asyncHandler(async (req: Request, res: Res
     await user.save();
   }
 
-  mailer.sendVerificationEmail({
-    code: user.verificationCode,
-    name: `${user.firstName} ${user.lastName}`,
-    to: user.email,
-  });
+  // mailer.sendVerificationEmail({
+  //   code: user.verificationCode,
+  //   name: `${user.firstName} ${user.lastName}`,
+  //   to: user.email,
+  // });
 
   res.status(200).json({
     success: true,
@@ -117,13 +136,29 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response, next
   if (user.verificationCode !== code) {
     throw new ErrorHandler("Invalid verification code", 400);
   }
+
+  user.verified = true;
+  user.verificationCode = undefined;
+  await user.save();
+
+  const token = user.signAccessToken();
+  const profile = user.getProfile();
+
+  res.status(200).json({
+    success: true,
+    message: "Registration Successful",
+    data: {
+      token,
+      user: profile,
+    },
+  });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   if (!validator.isEmail(email)) {
-    throw new ErrorHandler("Invalid email", 400);
+    throw new ErrorHandler("Please Enter a Valid Email Address!", 400);
   }
 
   const user = await User.findOne({ email });
