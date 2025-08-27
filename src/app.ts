@@ -4,6 +4,7 @@ import cors from "cors";
 import errorMiddleware from "./middlewares/error";
 import ErrorHandler from "./utils/AppError";
 import authRouter from "./routes/auth.route";
+import ProjectRouter from "./routes/project.route";
 
 export const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors());
 
 // Authentication routes
 app.use("/api/auth", authRouter);
+app.use("/api/projects", ProjectRouter);
 
 app.get("/api/test", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({

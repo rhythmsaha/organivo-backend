@@ -25,8 +25,6 @@ class NodeMailer {
       text,
       html,
     });
-
-    console.log("Message sent: %s", info.messageId);
   }
 
   async sendVerificationEmail({ code, name, to }: { to: string; code: string; name: string }) {

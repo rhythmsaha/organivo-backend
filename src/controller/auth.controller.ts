@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import User, { IUser, TempEmail } from "../models/User.model";
 import { default as validator } from "validator";
@@ -24,7 +24,7 @@ interface CreateAccountBody {
   password: string;
 }
 
-export const createAccount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const createAccount = asyncHandler(async (req: Request, res: Response) => {
   const { firstName, lastName, email, password } = req.body as CreateAccountBody;
   if (!firstName || !lastName || !email || !password) {
     throw new ErrorHandler("All fields are required", 400);
@@ -79,7 +79,7 @@ export const createAccount = asyncHandler(async (req: Request, res: Response, ne
   });
 });
 
-export const resendVerificationMail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const resendVerificationMail = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
 
   if (!validator.isEmail(email)) {
@@ -117,7 +117,7 @@ export const resendVerificationMail = asyncHandler(async (req: Request, res: Res
   });
 });
 
-export const verifyEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
   const { email, code } = req.body;
 
   if (!validator.isEmail(email)) {
@@ -155,7 +155,7 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response, next
   });
 });
 
-export const login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!validator.isEmail(email)) {
@@ -187,7 +187,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
   });
 });
 
-export const getSession = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const getSession = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
@@ -215,7 +215,7 @@ export const getSession = asyncHandler(async (req: Request, res: Response, next:
   });
 });
 
-export const getProfile = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
@@ -239,7 +239,7 @@ export const getProfile = asyncHandler(async (req: Request, res: Response, next:
   });
 });
 
-export const updateProfile = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
@@ -268,7 +268,7 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response, ne
   });
 });
 
-export const updatePassword = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
@@ -300,7 +300,7 @@ export const updatePassword = asyncHandler(async (req: Request, res: Response, n
 });
 
 // Email Update
-export const updateEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const updateEmail = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
@@ -351,7 +351,7 @@ export const updateEmail = asyncHandler(async (req: Request, res: Response, next
   });
 });
 
-export const resendVerificationCode = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const resendVerificationCode = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
   const { sessionId } = req.body;
 
@@ -385,7 +385,7 @@ export const resendVerificationCode = asyncHandler(async (req: Request, res: Res
   });
 });
 
-export const verifyNewEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const verifyNewEmail = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {
