@@ -168,6 +168,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     throw new ErrorHandler("User not found", 404);
   }
 
+  if (!user.verified) {
+    throw new ErrorHandler("User is not verified", 403);
+  }
+
   const isMatch = await user.comparePassword(password);
 
   if (!isMatch) {
