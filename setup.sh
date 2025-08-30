@@ -20,7 +20,7 @@ chmod +x mongo-init/init-mongo.js
 
 # Build and start containers
 echo "Building and starting containers..."
-docker-compose up --build -d
+docker compose up --build -d
 
 echo "✅ Setup complete!"
 echo ""
@@ -29,9 +29,9 @@ echo "MongoDB will be available at: localhost:3002"
 echo ""
 echo "To check logs: docker-compose logs -f"
 echo "To stop: docker-compose down"
-echo "To stop and remove volumes: docker-compose down -v"
+echo "To stop and remove volumes: docker compose down -v"
 
 # Display container status
 echo ""
 echo "Container status:"
-docker-compose ps
+docker compose ps
