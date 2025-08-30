@@ -1,18 +1,19 @@
 import nodemailer from "nodemailer";
 import ejs from "ejs";
 import path from "path";
+import { SMTP_HOST, SMTP_PASS, SMTP_SECURE, SMTP_USER } from "../config/env";
 
 class NodeMailer {
   private transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
+      host: SMTP_HOST,
       port: 465,
-      secure: true,
+      secure: SMTP_SECURE, // true for 465, false for other ports
       auth: {
-        user: "organivo@rhythmsaha.dev",
-        pass: "g6&nwDsn",
+        user: SMTP_USER,
+        pass: SMTP_PASS,
       },
     });
   }

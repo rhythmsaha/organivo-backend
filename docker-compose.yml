@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: organivo-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      # Add other environment variables as needed
+    depends_on:
+      - mongodb
+    networks:
+      - organivo-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs # Optional: for application logs
+
+  mongodb:
+    image: mongo:7.0
+    container_name: organivo-mongodb
+    ports:
+      - "3002:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB_NAME}
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - organivo-network
+    restart: unless-stopped
+    command: --auth --bind_ip_all
+
+networks:
+  organivo-network:
+    driver: bridge
+    internal: false # Set to true if you want to restrict external access
+
+volumes:
+  mongodb_data:
+    driver: local
