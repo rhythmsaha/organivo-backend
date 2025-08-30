@@ -1,6 +1,4 @@
-# MERN Backend Docker Setup
-
-A Docker configuration for your MERN stack backend with MongoDB, designed to work with a frontend deployed on Vercel.
+# Backend Docker Setup
 
 ## 🚀 Quick Start
 
