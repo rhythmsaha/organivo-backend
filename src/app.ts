@@ -19,7 +19,7 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 app.use("/api/projects", ProjectRouter);
 
-app.get("/api/test", (req: Request, res: Response, next: NextFunction) => {
+app.get("/health", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
     success: true,
     message: "API is working",
