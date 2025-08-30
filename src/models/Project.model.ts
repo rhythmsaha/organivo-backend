@@ -6,6 +6,7 @@ export interface IProject extends Document {
   owner: ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
+  lists: ObjectId[];
   status: "active" | "completed" | "archived";
   priority?: "low" | "medium" | "high";
   isPublic?: boolean;
@@ -34,6 +35,13 @@ const ProjectSchema = new Schema<IProject>(
       required: [true, "Project must have an owner"],
       index: true,
     },
+
+    lists: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "List",
+      },
+    ],
 
     status: {
       type: String,

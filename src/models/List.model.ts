@@ -3,7 +3,6 @@ import { Document, Schema, Model, model, ObjectId } from "mongoose";
 export interface IList extends Document {
   title: string;
   description?: string;
-  order: number;
   projectId: ObjectId;
 }
 
@@ -22,11 +21,6 @@ const ListSchema = new Schema<IList>(
       minlength: [0, "Description must be at least 0 characters long"],
       maxlength: [500, "Description must be at most 500 characters long"],
       trim: true,
-    },
-
-    order: {
-      type: Number,
-      required: [true, "List must have an order"],
     },
 
     projectId: {
