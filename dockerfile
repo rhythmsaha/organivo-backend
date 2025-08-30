@@ -16,7 +16,7 @@ COPY . .
 # Build the TypeScript code
 RUN npm run build
 
-RUN cp src/config/emails/ dist/src/config/ -r
+RUN cp src/config/emails/ dist/config/ -r
 
 # Remove devDependencies for production
 RUN npm prune --production
