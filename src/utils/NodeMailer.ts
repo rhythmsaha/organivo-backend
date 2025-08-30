@@ -10,7 +10,7 @@ class NodeMailer {
     this.transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: 465,
-      secure: SMTP_SECURE, // true for 465, false for other ports
+      secure: true, // true for 465, false for other ports
       auth: {
         user: SMTP_USER,
         pass: SMTP_PASS,
